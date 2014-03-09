@@ -24,11 +24,15 @@ namespace Reader {
     public partial class MainWindow : Window, INotifyPropertyChanged {
         public MainWindow() {
             InitializeComponent();
-            this.Text = System.IO.File.ReadAllText(@"..\..\Text.txt");
-            this.Text = this.Text.Replace(' ', '\n');
+            var path = @"C:\Users\Amichai\Dropbox\Share Folder\Literature\grapes-of-wrath.txt";
+            //var path = @"..\..\Text.txt";
+            var t = System.IO.File.ReadAllText(path);
+            t = t.Replace(' ', '\n');
             this.lastRender = DateTime.Now;
+            this.Index = 0;
             Task.Run(() => {
-                var words = this.Text.Split('\n');
+                var words = t.Split('\n');
+                this.WordCount = words.Length;
                 try {
                     render(words);
                 } catch (TaskCanceledException ex) {
@@ -38,6 +42,8 @@ namespace Reader {
         }
 
         private DateTime lastRender;
+
+        public int WordCount { get; set; }
 
         private double _WPM;
         public double WPM {
@@ -50,12 +56,39 @@ namespace Reader {
             }
         }
 
+        private int _Index;
+        public int Index {
+            get { return _Index; }
+            set {
+                if (_Index != value) {
+                    _Index = value;
+                    OnPropertyChanged("Index");
+                    this.Percent = this.Index * 100.0 / (double)this.WordCount;
+                    this.Remaining = TimeSpan.FromMilliseconds(this.sleep * (this.WordCount - this.Index));
+                    
+                }
+            }
+        }
+
+        private double _Percent;
+        public double Percent {
+            get { return _Percent; }
+            set {
+                if (_Percent != value) {
+                    _Percent = value;
+                    OnPropertyChanged("Percent");
+                }
+            }
+        }
+
         private void render(string[] words) {
-            foreach (var w in words) {
-                if (pause) {
+            while(true) {
+                if (pause || this.Index >= words.Length) {
                     Thread.Sleep(20);
                     continue;
                 }
+                var w = words[this.Index++];
+                this.Text = w;
                 Dispatcher.Invoke((Action)(() => {
                     var s = this.MeasureString(w);
                     string OrpLetter;
@@ -65,18 +98,17 @@ namespace Reader {
                     this.LetterMarginBottom = new Thickness(this.left, this.top + 30, 0, 0);
                     this.textBlock.Margin = new Thickness(-prefixSize.Width + 40, 20, 0, 0);
                     this.LetterWidth = this.MeasureString(OrpLetter).Width;
-                    this.left += s.Width + spaceWidth;
                     this.left = 40;
-                    //28.39 is too slow
-                    top += s.Height + 28.395;
                     this.gridRoot.Margin = new Thickness(0, -this.top + Height / 2, 0, 0);
                 }));
-                this.WPM = 1.0 / (DateTime.Now - this.lastRender).TotalMinutes;
+                this.perWord = (DateTime.Now - this.lastRender);
+                this.WPM = 1.0 / perWord.TotalMinutes;
                 this.lastRender = DateTime.Now;
                 Thread.Sleep(sleep);
             }
         }
 
+        private TimeSpan perWord;
         private int sleep = 100;
 
         private string getPrefix(string word, out string letter) {
@@ -176,19 +208,35 @@ namespace Reader {
 
         private bool pause = false;
 
-        private void Window_PreviewKeyDown_1(object sender, KeyEventArgs e) {
+        private TimeSpan _Remaining;
+        public TimeSpan Remaining {
+            get { return _Remaining; }
+            set {
+                if (_Remaining != value) {
+                    _Remaining = value;
+                    OnPropertyChanged("Remaining");
+                }
+            }
+        }
 
+        private void Window_PreviewKeyDown_1(object sender, KeyEventArgs e) {
             switch (e.Key) {
                 case Key.Space:
                     pause = !pause;
                     break;
                 case Key.Up:
-                    this.sleep += 5;
+                    this.sleep += 1;
                     break;
                 case Key.Down:
-                    this.sleep -= 5;
+                    this.sleep -= 1;
                     if (this.sleep < 0) {
                         this.sleep = 0;
+                    }
+                    break;
+                case Key.Left:
+                    this.Index -= 5;
+                    if (this.Index < 0) {
+                        this.Index = 0;
                     }
                     break;
             }

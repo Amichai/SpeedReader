@@ -3,21 +3,26 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         PreviewKeyDown="Window_PreviewKeyDown_1"
-        Title="MainWindow" Height="950" Width="525">
+        Title="MainWindow" Height="244" Width="371">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="5" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <ScrollViewer>
-            <Grid Name="gridRoot">
-                <TextBlock Name="textBlock" Margin="40" Text="{Binding Text}" LineHeight="55" FontSize="20" TextWrapping="Wrap"></TextBlock>
-                <Rectangle Width="{Binding LetterWidth}" Height="5" Fill="Red" Stroke="Red" HorizontalAlignment="Left" Margin="{Binding LetterMargin}" VerticalAlignment="Top">
-                </Rectangle>
-                <Rectangle Width="{Binding LetterWidth}" Height="5" Fill="Red" Stroke="Red" HorizontalAlignment="Left" Margin="{Binding LetterMarginBottom}" VerticalAlignment="Top">
-                </Rectangle>
-            </Grid>
-        </ScrollViewer>
-        <TextBlock  Grid.Column="1" Text="{Binding WPM, StringFormat=F1}"></TextBlock>
+        <Grid Name="gridRoot">
+            <TextBlock Name="textBlock" Margin="40" Text="{Binding Text}" LineHeight="55" FontSize="20" TextWrapping="Wrap"></TextBlock>
+            <Rectangle Width="{Binding LetterWidth}" Height="5" Fill="Red" Stroke="Red" HorizontalAlignment="Left" Margin="{Binding LetterMargin}" VerticalAlignment="Top">
+            </Rectangle>
+            <Rectangle Width="{Binding LetterWidth}" Height="5" Fill="Red" Stroke="Red" HorizontalAlignment="Left" Margin="{Binding LetterMarginBottom}" VerticalAlignment="Top">
+            </Rectangle>
+        </Grid>
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></GridSplitter>
+        <StackPanel Grid.Column="2">
+            <TextBlock Text="WPM: "><Run Text="{Binding WPM, StringFormat=F1}"/></TextBlock>
+            <TextBlock Text="Word Index: " ><Run Text="{Binding Index}"/></TextBlock>
+            <TextBlock Text="Percent: "><Run Text="{Binding Percent, StringFormat=F2}"/></TextBlock>
+            <TextBlock Text="Remaining: "><Run Text="{Binding Remaining, StringFormat={}{0:\\.hh\\:mm\\:ss}}"/></TextBlock>
+        </StackPanel>
     </Grid>
 </Window>
