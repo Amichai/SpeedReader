@@ -26,6 +26,7 @@ namespace Reader {
             InitializeComponent();
             this.Text = System.IO.File.ReadAllText(@"..\..\Text.txt");
             this.Text = this.Text.Replace(' ', '\n');
+            this.lastRender = DateTime.Now;
             Task.Run(() => {
                 var words = this.Text.Split('\n');
                 try {
@@ -34,6 +35,19 @@ namespace Reader {
 
                 }
             });
+        }
+
+        private DateTime lastRender;
+
+        private double _WPM;
+        public double WPM {
+            get { return _WPM; }
+            set {
+                if (_WPM != value) {
+                    _WPM = value;
+                    OnPropertyChanged("WPM");
+                }
+            }
         }
 
         private void render(string[] words) {
@@ -56,8 +70,9 @@ namespace Reader {
                     //28.39 is too slow
                     top += s.Height + 28.395;
                     this.gridRoot.Margin = new Thickness(0, -this.top + Height / 2, 0, 0);
-
                 }));
+                this.WPM = 1.0 / (DateTime.Now - this.lastRender).TotalMinutes;
+                this.lastRender = DateTime.Now;
                 Thread.Sleep(sleep);
             }
         }
@@ -172,7 +187,9 @@ namespace Reader {
                     break;
                 case Key.Down:
                     this.sleep -= 5;
-
+                    if (this.sleep < 0) {
+                        this.sleep = 0;
+                    }
                     break;
             }
         }

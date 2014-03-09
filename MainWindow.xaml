@@ -4,14 +4,20 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         PreviewKeyDown="Window_PreviewKeyDown_1"
         Title="MainWindow" Height="950" Width="525">
-    <ScrollViewer>
-    <Grid Name="gridRoot">
-        <TextBlock Name="textBlock" Margin="40" Text="{Binding Text}" LineHeight="55" FontSize="20" TextWrapping="Wrap"></TextBlock>
-        <Rectangle Width="{Binding LetterWidth}" Height="5" Fill="Red" Stroke="Red" HorizontalAlignment="Left" Margin="{Binding LetterMargin}" VerticalAlignment="Top">
-        </Rectangle>
-
-        <Rectangle Width="{Binding LetterWidth}" Height="5" Fill="Red" Stroke="Red" HorizontalAlignment="Left" Margin="{Binding LetterMarginBottom}" VerticalAlignment="Top">
-        </Rectangle>
-        </Grid>
-    </ScrollViewer>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <ScrollViewer>
+            <Grid Name="gridRoot">
+                <TextBlock Name="textBlock" Margin="40" Text="{Binding Text}" LineHeight="55" FontSize="20" TextWrapping="Wrap"></TextBlock>
+                <Rectangle Width="{Binding LetterWidth}" Height="5" Fill="Red" Stroke="Red" HorizontalAlignment="Left" Margin="{Binding LetterMargin}" VerticalAlignment="Top">
+                </Rectangle>
+                <Rectangle Width="{Binding LetterWidth}" Height="5" Fill="Red" Stroke="Red" HorizontalAlignment="Left" Margin="{Binding LetterMarginBottom}" VerticalAlignment="Top">
+                </Rectangle>
+            </Grid>
+        </ScrollViewer>
+        <TextBlock  Grid.Column="1" Text="{Binding WPM, StringFormat=F1}"></TextBlock>
+    </Grid>
 </Window>
