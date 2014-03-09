@@ -29,7 +29,7 @@ namespace Reader {
             var t = System.IO.File.ReadAllText(path);
             t = t.Replace(' ', '\n');
             this.lastRender = DateTime.Now;
-            this.Index = 0;
+            this.Index = Properties.Settings.Default.CurrentPosition ;
             Task.Run(() => {
                 var words = t.Split('\n');
                 this.WordCount = words.Length;
@@ -65,7 +65,7 @@ namespace Reader {
                     OnPropertyChanged("Index");
                     this.Percent = this.Index * 100.0 / (double)this.WordCount;
                     this.Remaining = TimeSpan.FromMilliseconds(this.sleep * (this.WordCount - this.Index));
-                    
+
                 }
             }
         }
@@ -82,19 +82,19 @@ namespace Reader {
         }
 
         private void render(string[] words) {
-            while(true) {
+            while (true) {
                 if (pause || this.Index >= words.Length) {
                     Thread.Sleep(20);
                     continue;
                 }
                 var w = words[this.Index++];
                 this.Text = w;
+                string OrpLetter;
+                var prefix = this.getPrefix(w, out OrpLetter);
                 Dispatcher.Invoke((Action)(() => {
                     var s = this.MeasureString(w);
-                    string OrpLetter;
-                    var prefix = this.getPrefix(w, out OrpLetter);
                     var prefixSize = this.MeasureString(prefix);
-                    this.LetterMargin = new Thickness(this.left , this.top, 0, 0);
+                    this.LetterMargin = new Thickness(this.left, this.top, 0, 0);
                     this.LetterMarginBottom = new Thickness(this.left, this.top + 30, 0, 0);
                     this.textBlock.Margin = new Thickness(-prefixSize.Width + 40, 20, 0, 0);
                     this.LetterWidth = this.MeasureString(OrpLetter).Width;
@@ -102,11 +102,19 @@ namespace Reader {
                     this.gridRoot.Margin = new Thickness(0, -this.top + Height / 2, 0, 0);
                 }));
                 this.perWord = (DateTime.Now - this.lastRender);
-                this.WPM = 1.0 / perWord.TotalMinutes;
+                this.WPM = 1.0 / TimeSpan.FromMilliseconds(sleep).TotalMinutes;
                 this.lastRender = DateTime.Now;
-                Thread.Sleep(sleep);
+                Thread.Sleep(5);
+                var lst = w.LastOrDefault();
+                if (!punctuation.Contains(lst)) {
+                    Thread.Sleep(sleep - 15);
+                } else {
+                    Thread.Sleep(sleep + 50);
+                }
             }
         }
+
+        private List<char> punctuation = new List<char>() { '.', ',', ';' };
 
         private TimeSpan perWord;
         private int sleep = 100;
@@ -223,6 +231,10 @@ namespace Reader {
             switch (e.Key) {
                 case Key.Space:
                     pause = !pause;
+                    if(pause){
+                        Properties.Settings.Default.CurrentPosition = this.Index;
+                        Properties.Settings.Default.Save();
+                    }
                     break;
                 case Key.Up:
                     this.sleep += 1;
@@ -234,10 +246,16 @@ namespace Reader {
                     }
                     break;
                 case Key.Left:
-                    this.Index -= 5;
+                    this.Index -= 10;
                     if (this.Index < 0) {
                         this.Index = 0;
                     }
+                    break;
+                case Key.Right:
+                    this.Index += 10;
+                    break;
+                case Key.R:
+                    this.Index = 0;
                     break;
             }
         }

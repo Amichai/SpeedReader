@@ -8,7 +8,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" />
             <ColumnDefinition Width="5" />
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid Name="gridRoot">
             <TextBlock Name="textBlock" Margin="40" Text="{Binding Text}" LineHeight="55" FontSize="20" TextWrapping="Wrap"></TextBlock>
@@ -23,6 +23,7 @@
             <TextBlock Text="Word Index: " ><Run Text="{Binding Index}"/></TextBlock>
             <TextBlock Text="Percent: "><Run Text="{Binding Percent, StringFormat=F2}"/></TextBlock>
             <TextBlock Text="Remaining: "><Run Text="{Binding Remaining, StringFormat={}{0:\\.hh\\:mm\\:ss}}"/></TextBlock>
+            <ProgressBar Value="{Binding Percent}" Height="35"/>
         </StackPanel>
     </Grid>
 </Window>
